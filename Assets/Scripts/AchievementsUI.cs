@@ -2,96 +2,106 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using DG.Tweening;
 
 public class AchievementsUI : MonoBehaviour {
-	[SerializeField] Animator achievementsTitle;
-	[Space]
+	[SerializeField] GameObject tutorial;
+	[SerializeField] GameObject content;
+	[SerializeField] Animator title;
 	[SerializeField] Animator counter;
 	[SerializeField] TextMeshProUGUI counterTMP;
 	[Space]
 	[SerializeField] AchievementsCard card;
 	[SerializeField] RectTransform cardsParent;
+	[SerializeField] CanvasGroup scrollBar;
 	[Space]
-	[SerializeField] DummyData data;
+	[SerializeField] DummyGameData gameData;
+	[SerializeField] int earnedIndex = 4;
 
-	public List<AchievementsCard> activeAchievements = new();
-	int earnedIndex = 4;
-	bool isActive { get; set; }
+	List<AchievementsCard> activeAchievements = new();
+	DummyPlayerData playerData;
 
-	/// POLISH: Toggle Group, start with HOME
-	/// POLISH: Toggle Group, Cute Selection Anim
+	bool isOpen => content.activeInHierarchy;
+
+	/// POLISH: Toggle Group > start with HOME, cute selection Anim, 
+	/// POLISH: Animations > OnClick flare, New Achievement hype
 
 	void Start() => PopulatePlayerDataList();
 
 	void Update() => EarnAchievementHack();
 
 	void PopulatePlayerDataList() {
+		playerData = new DummyPlayerData();
+
 		for (int i = 0; i < earnedIndex; i++) {
-			data.playerAchievements.Add(data.gameAchievements[i]);
+			playerData.playerAchievements.Add(gameData.gameAchievements[i]);
 		}
 	}
 
-	// Called in "Items" Button on NavBar. Normally a NavBar script would be used instead of the editor shortcut, but doin it this way to save time
-	public void Initialize() {
-		if (isActive) { return; }
+	// Called in "Items" NavBar Button Event
+	public void Open() {
+		if (isOpen) { return; }
 
-		/// Play animations (title, cards)
+		content.SetActive(true);
 
-		foreach (var achievement in data.playerAchievements) {
-			var newCard = Instantiate(card, cardsParent);
-			newCard.Initialize(achievement.title, achievement.description, achievement.icon);
-			activeAchievements.Add(newCard);
-		}
+		tutorial.SetActive(false); // used instead of UI toggle panels function
 
 		UpdateEarnedText();
-		//StartCoroutine(UpdateLayoutGroup());
 		StartCoroutine(SpawnCoroutine());
-
-		isActive = true;
 	}
 
+	// Called in NavBar Buttons Event
+	public void Close() => StartCoroutine(DespawnCoroutine());
+
+	void UpdateEarnedText() => counterTMP.text = $"{earnedIndex} / {gameData.gameAchievements.Count}";
 
 	IEnumerator SpawnCoroutine() {
-		foreach (var achievement in data.playerAchievements) {
-			var newCard = Instantiate(card, cardsParent);
 
+		title.Play("Spawn");
+		counter.Play("Spawn");
+
+		yield return new WaitForSeconds(0.3f);
+
+		foreach (var achievement in playerData.playerAchievements) {
+
+			var newCard = Instantiate(card, cardsParent);
 			newCard.Initialize(achievement.title, achievement.description, achievement.icon);
 			activeAchievements.Add(newCard);
+			yield return new WaitForSeconds(0.15f);
 
-			yield return new WaitForSeconds(0.1f);
 		}
+
+		scrollBar.DOFade(1, 0.5f);
 	}
 
-	IEnumerator UpdateLayoutGroup() {
-		var verticalLayout = cardsParent.GetComponent<VerticalLayoutGroup>();
-		verticalLayout.enabled = false;
-		yield return new WaitForEndOfFrame();
-		verticalLayout.enabled = true;
-	}
+	IEnumerator DespawnCoroutine() {
 
-	void UpdateEarnedText() => counterTMP.text = $"{earnedIndex} / {data.gameAchievements.Count}";
+		title.Play("Despawn");
+		counter.Play("Despawn");
+		scrollBar.DOFade(0, 0.5f);
 
-	// Called in "Home" Button on NavBar. Normally a NavBar script would be used instead of the editor shortcut, but doin it this way to save time
-	public void ResetUI() {
-		/// Play despawn Anim and disable cards
+		foreach (var card in activeAchievements) {
+			card.PlayDespawn();
+		}
+
+		yield return new WaitForSeconds(0.4f);
+		content.SetActive(false);
 
 		foreach (var card in activeAchievements) {
 			Destroy(card.gameObject);
 		}
 
 		activeAchievements.Clear();
-
-		isActive = false;
+		tutorial.SetActive(true); // used instead of toggle UI panels function
 	}
+
 	void EarnAchievementHack() {
-		if (earnedIndex >= data.gameAchievements.Count || isActive) { return; }
+		if (earnedIndex >= gameData.gameAchievements.Count || isOpen) { return; }
 
 		if (Input.GetKeyDown(KeyCode.E)) {
-			data.playerAchievements.Add(data.gameAchievements[earnedIndex]);
+			playerData.playerAchievements.Add(gameData.gameAchievements[earnedIndex]);
 			Debug.Log("new Achievement Unlocked! Reload tab to view");
 			earnedIndex++;
 		}
-
 	}
 }

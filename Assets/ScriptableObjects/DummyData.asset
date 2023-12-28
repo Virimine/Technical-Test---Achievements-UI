@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 3a0ebc3fab4560d4ba58bfa5c5e81eed, type: 3}
   m_Name: DummyData
   m_EditorClassIdentifier: Assembly-CSharp::DummyData
   gameAchievements:
@@ -27,8 +27,9 @@ MonoBehaviour:
     description: Exchange DMs with all the roomies.
     icon: {fileID: 1398176332, guid: d6307055182c148408feb02fb1e2d258, type: 3}
   - title: Date Legend
-    description: "Go on 100 dates with roomies. You\u2019re on a roll, aren\u2019t
-      you?!"
+    description: "Go on 50 dates with roomies. You\u2019re on a roll, aren\u2019t
+      you?! Go on 50 dates with roomies. You\u2019re on a roll, aren\u2019t you?!
+      Go on 50 dates with roomies. You\u2019re on a roll, aren\u2019t you?!"
     icon: {fileID: -700920145, guid: d6307055182c148408feb02fb1e2d258, type: 3}
   - title: Macchiatto, Cappuccino, Americano
     description: Give away 300 coffees to roomies.
@@ -39,4 +40,3 @@ MonoBehaviour:
   - title: Lone Wolf
     description: Exchange DMs with no roomies.
     icon: {fileID: 1398176332, guid: d6307055182c148408feb02fb1e2d258, type: 3}
-  playerAchievements: []
