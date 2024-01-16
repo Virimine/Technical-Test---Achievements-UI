@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using DG.Tweening;
+//using DG.Tweening;
 
 public class AchievementsUI : MonoBehaviour {
 	[SerializeField] GameObject tutorial;
@@ -69,16 +69,19 @@ public class AchievementsUI : MonoBehaviour {
 			activeAchievements.Add(newCard);
 			yield return new WaitForSeconds(0.15f);
 
-		}
 
-		scrollBar.DOFade(1, 0.5f);
+		}
+		//scrollBar.DOFade(1, 0.5f);
+		StartCoroutine(ScrollbarFade(1, 0.5f));
 	}
 
 	IEnumerator DespawnCoroutine() {
 
 		title.Play("Despawn");
 		counter.Play("Despawn");
-		scrollBar.DOFade(0, 0.5f);
+
+		//scrollBar.DOFade(0, 0.5f);
+		StartCoroutine(ScrollbarFade(0, 0.5f));
 
 		foreach (var card in activeAchievements) {
 			card.PlayDespawn();
@@ -103,5 +106,18 @@ public class AchievementsUI : MonoBehaviour {
 			Debug.Log("new Achievement Unlocked! Reload tab to view");
 			earnedIndex++;
 		}
+	}
+
+	IEnumerator ScrollbarFade(float endValue, float duration) {
+
+		float t = 0;
+		float startValue = scrollBar.alpha;
+
+		while (t < duration) {
+			scrollBar.alpha = Mathf.Lerp(startValue, endValue, t / duration);
+			t += Time.deltaTime;
+			yield return null;
+		}
+		scrollBar.alpha = endValue;
 	}
 }
